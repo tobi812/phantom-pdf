@@ -36,6 +36,14 @@ class PdfGenerator
     private $commandLineOptions;
 
     /**
+     * @param string $binaryPath
+     */
+    public function __construct($binaryPath)
+    {
+        $this->binaryPath = $binaryPath;
+    }
+
+    /**
      * @param string $html
      * @param string $targetPath
      * @param array|Options|null options
