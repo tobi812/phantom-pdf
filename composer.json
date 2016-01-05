@@ -1,0 +1,24 @@
+{
+  "name": "tobi812/phantom-pdf",
+  "description": "",
+  "keywords": [
+    "phantom.js", "pdf"
+  ],
+  "authors": [
+    {
+      "name": "Tobias Rosenstock",
+      "email": "to@bananenbaum.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/process": "~2.6.9"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "PhantomPdf": "src/"
+    }
+  }
+}
