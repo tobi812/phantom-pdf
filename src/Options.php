@@ -65,8 +65,7 @@ class Options
      */
     public function toArray()
     {
-        $className = get_class($this);
-        $classVars = get_class_vars($className);
+        $classVars = get_object_vars($this);
 
         foreach ($classVars as $key => $value) {
             if ($value === null) {

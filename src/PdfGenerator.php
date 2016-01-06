@@ -33,7 +33,7 @@ class PdfGenerator
     /**
      * @var array
      */
-    private $commandLineOptions;
+    private $commandLineOptions = [];
 
     /**
      * @param string $binaryPath
@@ -51,11 +51,11 @@ class PdfGenerator
     public function renderFileFromHtml($html, $targetPath, $options = null)
     {
         $tmpFilePath = $this->createTempFilePath(self::HTML_EXTENSION);
-        $this->createFile($html, $tmpFilePath);
+        $this->createFile($tmpFilePath, $html);
 
-        $prepareOptions = $this->prepareOptions($options);
+        $preparedOptions = $this->prepareOptions($options);
 
-        $this->convertToPdf($tmpFilePath, $targetPath, $prepareOptions);
+        $this->convertToPdf($tmpFilePath, $targetPath, $preparedOptions);
     }
 
     /**
@@ -67,10 +67,12 @@ class PdfGenerator
     public function renderOutputFromHtml($html, $options = null)
     {
         $tmpHtmlFilePath = $this->createTempFilePath(self::HTML_EXTENSION);
-        $this->createFile($html, $tmpHtmlFilePath);
+        $this->createFile($tmpHtmlFilePath, $html);
 
         $tmpPdfFilePath = $this->createTempFilePath(self::PDF_EXTENSION);
-        $this->convertToPdf($tmpHtmlFilePath, $tmpPdfFilePath, $options);
+
+        $preparedOptions = $this->prepareOptions($options);
+        $this->convertToPdf($tmpHtmlFilePath, $tmpPdfFilePath, $preparedOptions);
 
         return file_get_contents($tmpPdfFilePath);
     }
@@ -114,9 +116,9 @@ class PdfGenerator
      * @param string $content
      * @param string $filePath
      */
-    protected function createFile($content, $filePath)
+    protected function createFile($filePath, $content)
     {
-        file_put_contents($content, $filePath);
+        file_put_contents($filePath, $content);
     }
 
     /**
@@ -131,11 +133,9 @@ class PdfGenerator
 
         $filePath = sprintf(
             '%s/%s.%s',
-            [
-                $tempDirectory,
-                $uniqueId,
-                $extension
-            ]
+            $tempDirectory,
+            $uniqueId,
+            $extension
         );
 
         $this->tempFiles[] = $filePath;
@@ -155,9 +155,7 @@ class PdfGenerator
         } elseif ($options instanceof Options) {
             return $options->toArray();
         } else {
-            $defaultOptions = $this->getDefaultOptions();
-
-            return $defaultOptions->toArray();
+            return [];
         }
     }
 
@@ -176,23 +174,29 @@ class PdfGenerator
         }
 
         $process->run();
+        $error = $process->getErrorOutput();
+
+        if ($error) {
+            throw new \Exception($error);
+        }
     }
 
     /**
-     * @param string $resourcePath
-     * @param string $targetPath
+     * @param $resourcePath
+     * @param $targetPath
+     * @param array $options
      *
      * @return string
      */
-    protected function createCommand($resourcePath, $targetPath, $options)
+    protected function createCommand($resourcePath, $targetPath, array $options)
     {
         $commandLineOptions = implode(' ', $this->commandLineOptions);
-        $encodedOptions = escapeshellarg(json_decode($options));
+        $encodedOptions = escapeshellarg(json_encode($options));
 
         return implode(' ', [
             $this->binaryPath,
             $commandLineOptions,
-            '../js/phantom-pdf.js',
+            __DIR__ . '/../js/phantom-pdf.js',
             $resourcePath,
             $targetPath,
             $encodedOptions
@@ -213,21 +217,6 @@ class PdfGenerator
         }
 
         return $this->tempDirectory;
-    }
-
-    /**
-     * @return Options
-     */
-    protected function getDefaultOptions()
-    {
-        $defaultOptions = new Options();
-
-        $defaultOptions->setOrientation('Portrait');
-        $defaultOptions->setFormat('A4');
-        $defaultOptions->setZoomFactor(1);
-        $defaultOptions->setMargin('1cm');
-
-        return $defaultOptions;
     }
 
 }

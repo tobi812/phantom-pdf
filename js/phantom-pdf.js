@@ -1,4 +1,6 @@
-var args = require('system').args;
+var fs = require('fs');
+var system =  require('system');
+var args = system.args;
 
 if (args.length < 3) {
 
@@ -9,64 +11,95 @@ if (args.length < 3) {
 
 } else {
 
-    var fs = require('fs');
+    phantom.onError = getErrorHandler();
+
     var page = require('webpage').create();
     var resourcePath = args[1];
     var targetPath = args[2];
     var pageOptions = JSON.parse(args[3]);
     var format = { format: 'pdf' };
-
-    page.onError = getErrorHandler();
-    page.paperSize = getPaperSize(pageOptions);
-    page.customHeaders = pageOptions.customHeaders;
-    page.zoomFactor = pageOptions.zoomFactor;
-
+    var dirName = targetPath.substring(0, targetPath.lastIndexOf('/'));
     var pageNumPlaceholder = '#pageNum';
     var totalPagesPlaceholder = '#numPages';
-
-    if (pageOptions.pageNumPlaceholder) {
-        pageNumPlaceholder = pageOptions.pageNumPlaceholder;
-    }
-
-    if (pageOptions.totalPagesPlaceholder) {
-        totalPagesPlaceholder = pageOptions.totalPagesPlaceholder;
-    }
-
-    page.open(resourcePath, function (status) {
-        if (status !== 'success') {
-            console.log('Unable to load the file!');
-            phantom.exit(1);
-        } else {
-            console.log('SUCCESS');
-            page.render(targetPath, format);
-            phantom.exit(0);
+    var defaultPageSize = {
+        format: 'A4',
+        orientation: 'portrait',
+        margin: '1cm',
+        header: {
+            content: '',
+            height: '1cm'
+        },
+        footer: {
+            content: '',
+            height: '1cm'
         }
-    });
+    };
+
+    if (!fs.isWritable(dirName)) {
+        printErrorAndExit('Path ' + dirName + ' is not writable.', 1);
+    } else {
+        try {
+
+            if (pageOptions.pageNumPlaceholder) {
+                pageNumPlaceholder = pageOptions.pageNumPlaceholder;
+            }
+
+            if (pageOptions.totalPagesPlaceholder) {
+                totalPagesPlaceholder = pageOptions.totalPagesPlaceholder;
+            }
+
+            page.paperSize = getPaperSize(pageOptions);
+            page.customHeaders = pageOptions.customHeaders;
+            page.zoomFactor = pageOptions.zoomFactor;
+
+            page.open(resourcePath, function (status) {
+                if (status !== 'success') {
+                    printErrorAndExit('Unable to load file.', 1)
+                } else {
+                    page.render(targetPath, format);
+                    console.log('SUCCESS');
+                    phantom.exit(0);
+                }
+            });
+        } catch (e) {
+            printErrorAndExit(e.toString(), 1);
+        }
+    }
 }
 
 function getPaperSize(pageOptions) {
-    var paperSize = {};
+    var paperSize = defaultPageSize;
 
-    if (pageOptions.header) {
-        paperSize.header = renderTemplate(pageOptions.header);
+    if (pageOptions.headerContent || pageOptions.headerHeight) {
+        var headerHeight = pageOptions.headerHeight || defaultPageSize.header.height;
+        paperSize.header = renderTemplate(headerHeight, pageOptions.headerContent);
     }
 
-    if (pageOptions.footer) {
-        paperSize.footer = renderTemplate(pageOptions.footer);
+    if (pageOptions.footerContent || pageOptions.footerHeight) {
+        var footerHeight = pageOptions.footerHeight || defaultPageSize.footer.height;
+        paperSize.footer = renderTemplate(footerHeight, pageOptions.footerContent);
     }
 
-    paperSize.format = pageOptions.format;
-    paperSize.orientation = pageOptions.orientation;
-    paperSize.margin = pageOptions.margin;
+    if (pageOptions.format) {
+        paperSize.format = pageOptions.format;
+    }
+
+    if (pageOptions.orientation) {
+        paperSize.orientation = pageOptions.orientation;
+    }
+
+    if (pageOptions.margin) {
+        paperSize.margin = pageOptions.margin;
+    }
 
     return paperSize;
 }
 
-function renderTemplate(template) {
+function renderTemplate(height, content) {
     return {
-        height: template.height,
+        height: height,
         contents: phantom.callback(function(pageNum, numPages) {
-            return template.content
+            return content
                 .replace(pageNumPlaceholder, pageNum)
                 .replace(totalPagesPlaceholder, numPages)
             ;
@@ -86,6 +119,11 @@ function getErrorHandler() {
             });
         }
 
-        console.error(msgStack.join('\n'));
+        printErrorAndExit(msgStack.join('\n'), 1);
     };
+}
+
+function printErrorAndExit(message, exitCode) {
+    system.stderr.write(message);
+    phantom.exit(exitCode);
 }
