@@ -2,7 +2,6 @@
 
 namespace PhantomPdf;
 
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class PdfGenerator

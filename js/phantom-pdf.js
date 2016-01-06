@@ -1,5 +1,5 @@
 var fs = require('fs');
-var system =  require('system');
+var system = require('system');
 var args = system.args;
 
 if (args.length < 3) {
@@ -17,7 +17,7 @@ if (args.length < 3) {
     var resourcePath = args[1];
     var targetPath = args[2];
     var pageOptions = JSON.parse(args[3]);
-    var format = { format: 'pdf' };
+    var format = {format: 'pdf'};
     var dirName = targetPath.substring(0, targetPath.lastIndexOf('/'));
     var pageNumPlaceholder = '#pageNum';
     var totalPagesPlaceholder = '#numPages';
@@ -75,7 +75,7 @@ function getPaperSize(pageOptions) {
         paperSize.header = renderTemplate(headerHeight, pageOptions.headerContent);
     }
 
-    if (pageOptions.footerContent || pageOptions.footerHeight) {
+    if (pageOptions.footerContent || pageOptions.footerHeight) {
         var footerHeight = pageOptions.footerHeight || defaultPageSize.footer.height;
         paperSize.footer = renderTemplate(footerHeight, pageOptions.footerContent);
     }
@@ -98,11 +98,11 @@ function getPaperSize(pageOptions) {
 function renderTemplate(height, content) {
     return {
         height: height,
-        contents: phantom.callback(function(pageNum, numPages) {
+        contents: phantom.callback(function (pageNum, numPages) {
             return content
                 .replace(pageNumPlaceholder, pageNum)
                 .replace(totalPagesPlaceholder, numPages)
-            ;
+                ;
         })
     };
 }
