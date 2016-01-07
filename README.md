@@ -12,7 +12,12 @@ symfony/process: ~2.6.9
 
 Download PhantomJS: http://phantomjs.org/download.html
 
-Update Composer
+Install via Composer
+
+```
+composer require tobi812/phantom-pdf
+
+```
 
 ## Basic Usage
 
