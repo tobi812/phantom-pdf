@@ -10,14 +10,29 @@ class OptionTest extends \PHPUnit_Framework_TestCase
     {
         $options = new Options();
         $options->setFormat('MockFormat');
-        $options->setMargin('MockMargin');
-        $options->setOrientation('MockOrientation');
+        $options->setMargin(1);
+        $options->setOrientationLandscape();
 
         $actualOptionArray = $options->toArray();
         $expectedOptionArray = [
             'format' => 'MockFormat',
-            'margin' => 'MockMargin',
-            'orientation' => 'MockOrientation',
+            'margin' => '1cm',
+            'orientation' => 'landscape',
+            'zoomFactor' => 1,
+        ];
+
+        $this->assertEquals($expectedOptionArray, $actualOptionArray);
+    }
+
+    public function testDefaultOptions()
+    {
+        $options = new Options();
+
+        $actualOptionArray = $options->toArray();
+        $expectedOptionArray = [
+            'format' => 'A4',
+            'orientation' => 'portrait',
+            'zoomFactor' => 1,
         ];
 
         $this->assertEquals($expectedOptionArray, $actualOptionArray);

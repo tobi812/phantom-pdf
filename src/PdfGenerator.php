@@ -113,6 +113,14 @@ class PdfGenerator
     }
 
     /**
+     * @param string $tempDirectory
+     */
+    public function setTempDirectory($tempDirectory)
+    {
+        $this->tempDirectory = $tempDirectory;
+    }
+
+    /**
      * @param string $content
      * @param string $filePath
      */

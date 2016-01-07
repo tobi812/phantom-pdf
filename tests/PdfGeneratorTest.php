@@ -4,6 +4,7 @@ namespace PhantomPdf\Test;
 
 use PhantomPdf\PdfGenerator;
 
+
 class PdfGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -39,16 +40,14 @@ class PdfGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('string', $result);
     }
 
+    /**
+     * @expectedException \PhantomPdf\Exception\PhantomPdfException
+     * @expectedExceptionMessage /wrong/binary
+     */
     public function testExceptionBinaryDoesNotExist()
     {
-        $wrongBinaryPath = '/wrong/binary';
-        $this->setExpectedException(
-            'PhantomPdf\\Exception\\PhantomPdfException', $wrongBinaryPath
-        );
-
         $htmlMock = $this->getContentMock();
-
-        $pdfGenerator = new PdfGenerator($wrongBinaryPath);
+        $pdfGenerator = new PdfGenerator('/wrong/binary');
 
         $pdfGenerator->renderOutputFromHtml($htmlMock);
     }

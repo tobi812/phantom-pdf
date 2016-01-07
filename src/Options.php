@@ -4,26 +4,28 @@ namespace PhantomPdf;
 
 class Options
 {
+    const ORIENTATION_PORTRAIT = 'portrait';
+    const ORIENTATION_LANDSCAPE = 'landscape';
 
     /**
      * @var string
      */
-    private $format;
+    private $format = 'A4';
 
     /**
      * @var string
      */
-    private $orientation;
+    private $orientation = self::ORIENTATION_PORTRAIT;
 
     /**
-     * @var string
+     * @var array
      */
     private $customHeaders;
 
     /**
-     * @var string
+     * @var int
      */
-    private $zoomFactor;
+    private $zoomFactor = 1;
 
     /**
      * @var string
@@ -84,24 +86,26 @@ class Options
         $this->format = $format;
     }
 
-    /**
-     * @param string $orientation
-     */
-    public function setOrientation($orientation)
+    public function setOrientationPortrait()
     {
-        $this->orientation = $orientation;
+        $this->orientation = self::ORIENTATION_PORTRAIT;
+    }
+
+    public function setOrientationLandscape()
+    {
+        $this->orientation = self::ORIENTATION_LANDSCAPE;
     }
 
     /**
-     * @param string $customHeaders
+     * @param array $customHeaders
      */
-    public function setCustomHeaders($customHeaders)
+    public function setCustomHeaders(array $customHeaders)
     {
         $this->customHeaders = $customHeaders;
     }
 
     /**
-     * @param string $zoomFactor
+     * @param int $zoomFactor
      */
     public function setZoomFactor($zoomFactor)
     {
@@ -109,11 +113,12 @@ class Options
     }
 
     /**
-     * @param string $margin
+     * @param int $width
+     * @param string $unit
      */
-    public function setMargin($margin)
+    public function setMargin($width, $unit = 'cm')
     {
-        $this->margin = $margin;
+        $this->margin = $width . $unit;
     }
 
     /**
@@ -125,11 +130,12 @@ class Options
     }
 
     /**
-     * @param string $headerHeight
+     * @param int $width
+     * @param string $unit
      */
-    public function setHeaderHeight($headerHeight)
+    public function setHeaderHeight($width, $unit = 'cm')
     {
-        $this->headerHeight = $headerHeight;
+        $this->headerHeight = $width . $unit;
     }
 
     /**
@@ -141,11 +147,12 @@ class Options
     }
 
     /**
-     * @param string $footerHeight
+     * @param int $width
+     * @param string $unit
      */
-    public function setFooterHeight($footerHeight)
+    public function setFooterHeight($width, $unit = 'cm')
     {
-        $this->footerHeight = $footerHeight;
+        $this->footerHeight = $width . $unit;
     }
 
     /**
