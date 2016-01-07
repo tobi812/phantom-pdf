@@ -2,6 +2,7 @@
 
 namespace PhantomPdf;
 
+use PhantomPdf\Exception\PhantomPdfException;
 use Symfony\Component\Process\Process;
 
 class PdfGenerator
@@ -128,7 +129,7 @@ class PdfGenerator
     protected function createTempFilePath($extension)
     {
         $tempDirectory = $this->getTempDirectory();
-        $uniqueId = uniqid('phantom-pdf', true);
+        $uniqueId = uniqid('phantom-pdf-', true);
 
         $filePath = sprintf(
             '%s/%s.%s',
@@ -159,9 +160,11 @@ class PdfGenerator
     }
 
     /**
-     * @param string $resourcePath
-     * @param string $targetPath
+     * @param $resourcePath
+     * @param $targetPath
      * @param array $options
+     *
+     * @throws PhantomPdfException
      */
     protected function convertToPdf($resourcePath, $targetPath, array $options)
     {
@@ -176,7 +179,7 @@ class PdfGenerator
         $error = $process->getErrorOutput();
 
         if ($error) {
-            throw new \Exception($error);
+            throw new PhantomPdfException($error);
         }
     }
 
