@@ -55,9 +55,16 @@ $pdfGenerator = new PdfGenerator('/path/to/phantomjs-binary');
 
 $options = new Options();
 
-// Setup Page options
-$options->setMargin('1.5cm');
-$options->setOrientation('portrait');
+// Set margin (by default all widths are in cm)
+$options->setMargin(1.5);
+$options->setMargin(15, 'mm');
+
+// Set orientation
+$options->setOrientationPortrait();
+// or
+$options->setOrientationLandscape();
+
+// Set Format
 $options->setFormat('A5');
 
 $pdfGenerator->renderFileFromHtml($htmlString, $targetPath, $options);
@@ -72,11 +79,11 @@ $pdfGenerator->renderFileFromHtml($htmlString, $targetPath, $options);
 
 // Create a Header that appears on every page.
 $options->setHeaderContent('<h1>Header</h1>');
-$options->setHeaderHeight('3cm');
+$options->setHeaderHeight(3);
 
 // Create a Footer for every page. 
 $options->setFooterContent('<div>#pageNum / #totalPages</div>');
-$options->setFooterHeight('2cm');
+$options->setFooterHeight(2);
 
 // Use custom Placeholder for PageNumber and TotalPageCount
 $options->setPageNumPlaceholder('{{pageNum}}')
