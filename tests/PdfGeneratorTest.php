@@ -43,7 +43,7 @@ class PdfGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $wrongBinaryPath = '/wrong/binary';
         $this->setExpectedException(
-            'PhantomPdfException', $wrongBinaryPath
+            'PhantomPdf\\Exception\\PhantomPdfException', $wrongBinaryPath
         );
 
         $htmlMock = $this->getContentMock();
